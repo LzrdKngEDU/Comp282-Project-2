@@ -19,41 +19,39 @@ public class RedBlack<E extends Comparable<E>> implements TreeInterface<E> {
 @Override
 public void insert(E e) {
     Node insertedNode = insert(root, null, e); // Perform insertion
-    root = insertedNode; // Update root reference
-    root.isRed = false; // Ensure root is always black
+    root = insertedNode; 
+    root.isRed = false; 
 }
 
 private Node insert(Node node, Node parent, E e) {
     if (node == null) {
-        Node newNode = new Node(e); // Create a new red node
-        newNode.parent = parent;   // Set its parent
+        Node newNode = new Node(e);
+        newNode.parent = parent;  
         return newNode;
     }
 
     if (e.compareTo(node.element) < 0) {
-        node.left = insert(node.left, node, e); // Recur for left subtree
+        node.left = insert(node.left, node, e); 
     } else if (e.compareTo(node.element) > 0) {
-        node.right = insert(node.right, node, e); // Recur for right subtree
+        node.right = insert(node.right, node, e); 
     } else {
         return node; // Duplicates are not allowed
     }
-
-    // Fix any violations of Red-Black properties
     return fixViolations(node);
 }
 
 private Node fixViolations(Node node) {
-    // Case 1: Red child on the right (left rotation needed)
+    // Case 1: Red child on the right
     if (isRed(node.right) && !isRed(node.left)) {
         node = rotateLeft(node);
     }
 
-    // Case 2: Red child with a red grandchild on the left (right rotation needed)
+    // Case 2: Red child with a red grandchild on the left
     if (isRed(node.left) && isRed(node.left.left)) {
         node = rotateRight(node);
     }
 
-    // Case 3: Both children are red (flip colors)
+    // Case 3: Both children are red
     if (isRed(node.left) && isRed(node.right)) {
         flipColors(node);
     }
@@ -94,14 +92,13 @@ private void flipColors(Node node) {
     if (node.left != null) node.left.isRed = false;
     if (node.right != null) node.right.isRed = false;
 }
-// Jason End
-    @Override
-    public boolean find(E e) {
-        return find(root, e);
-    }
+@Override
+public boolean find(E e) {
+    return find(root, e);
+}
 
-    private boolean find(Node node, E e) {
-        if (node == null) return false;
+private boolean find(Node node, E e) {
+    if (node == null) return false;
         if (e.compareTo(node.element) < 0) {
             return find(node.left, e);
         } else if (e.compareTo(node.element) > 0) {
@@ -110,62 +107,135 @@ private void flipColors(Node node) {
             return true;
         }
     }
-// Aaron
-    @Override
-    public void delete(E e) {
-        root = delete(root, e); 
-    }
-    private Node delete(Node node, E e) {
-        if (node == null) return null;
-        if (e.compareTo(node.element) < 0) {
-            node.left = delete(node.left, e); // Left Tree
-        } else if (e.compareTo(node.element) > 0) {
-            node.right = delete(node.right, e); // Right Tree
-        } else {
-            if (node.left == null || node.right == null) {
-                Node replace = (node.left != null) ? node.left : node.right;
+// Jason End
+// Aaron Start
+@Override
+public void delete(E e) {
+    if (e == null || root == null) return;
+    root = delete(root, e);
+    if (root != null) root.isRed = false; // Ensure the root is always black
+}
 
-                if (replace != null) {
-                    replace.parent = node.parent; 
-                }
-                return replace; 
-            } else {//case 3
-                Node successor = findMin(node.right); // Small val
-                node.element = successor.element; //new element
-                node.right = delete(node.right, successor.element); //deletion
+private Node delete(Node node, E e) {
+    if (node == null) return null;
+
+    if (e.compareTo(node.element) < 0) {
+        if (node.left != null) {
+            if (!isRed(node.left) && !isRed(node.left.left)) {
+                node = moveRedLeft(node);
+            }
+            node.left = delete(node.left, e);
+        }
+    } else {
+        if (isRed(node.left)) {
+            node = rotateRight(node);
+        }
+        if (e.compareTo(node.element) == 0 && (node.right == null)) {
+            return null;
+        }
+        if (node.right != null) {
+            if (!isRed(node.right) && !isRed(node.right.left)) {
+                node = moveRedRight(node);
+            }
+            if (e.compareTo(node.element) == 0) {
+                Node successor = findMin(node.right);
+                node.element = successor.element;
+                node.right = deleteMin(node.right);
+            } else {
+                node.right = delete(node.right, e);
             }
         }
-// Aaron Start
-    @Override
-    public void printInOrder() {
-        printInOrder(root);
-        System.out.println(); // In-order traversal
     }
 
-    private void printInOrder(Node node) {
-        if (node != null) {
-            printInOrder(node.left);
-            System.out.print(node.element + " ");
-            printInOrder(node.right);
+    return fixViolations(node);
+}
+
+private Node deleteMin(Node node) {
+    if (node.left == null) return null;
+
+    if (!isRed(node.left) && !isRed(node.left.left)) {
+        node = moveRedLeft(node);
+    }
+
+    node.left = deleteMin(node.left);
+    return fixViolations(node);
+}
+
+private Node findMin(Node node) {
+    while (node.left != null) {
+        node = node.left;
+    }
+    return node;
+}
+
+private Node moveRedLeft(Node node) {
+    flipColors(node);
+    if (isRed(node.right.left)) {
+        node.right = rotateRight(node.right);
+        node = rotateLeft(node);
+        flipColors(node);
+    }
+    return node;
+}
+
+private Node moveRedRight(Node node) {
+    flipColors(node);
+    if (isRed(node.left.left)) {
+        node = rotateRight(node);
+        flipColors(node);
+    }
+    return node;
+}
+
+@Override
+public void printInOrder() {
+    printInOrder(root);
+    System.out.println();
+}
+
+private void printInOrder(Node node) {
+    if (node != null) {
+        printInOrder(node.left);
+        System.out.print(node.element + " ");
+        printInOrder(node.right);
+    }
+}
+
+public void statusRB() {
+    System.out.println("Red = " + countRedNodes(root) +
+            ", Black = " + countBlackNodes(root) +
+            ", BlackHeight = " + calculateBlackHeight(root));
+}
+
+private int countRedNodes(Node node) {
+    if (node == null) return 0;
+    return (node.isRed ? 1 : 0) + countRedNodes(node.left) + countRedNodes(node.right);
+}
+
+private int countBlackNodes(Node node) {
+    if (node == null) return 0;
+    return (!node.isRed ? 1 : 0) + countBlackNodes(node.left) + countBlackNodes(node.right);
+}
+
+private int calculateBlackHeight(Node node) {
+    if (node == null) return 0;
+    int leftHeight = calculateBlackHeight(node.left);
+    int rightHeight = calculateBlackHeight(node.right);
+    return (!node.isRed ? 1 : 0) + Math.max(leftHeight, rightHeight);
+}
+
+public void printRedBlack() {
+    printRedBlack(root);
+}
+
+private void printRedBlack(Node node) {
+    if (node != null) {
+        printRedBlack(node.left);
+        System.out.print("(" + node.element + (node.isRed ? ",R" : ",B") + ") ");
+        printRedBlack(node.right);
         }
-    }
+}
 
-    
-    public void statusRB() {
-        System.out.println("Red = ?, Black = ?, BlackHeight = ?");
-    }
-
-    public void printRedBlack() {
-        printRedBlack(root);
-    }
-    
-    private void printRedBlack(Node node) {
-        if (node != null) {
-            printRedBlack(node.left);
-            System.out.print("(" + node.element + (node.isRed ? ",R" : ",B") + ") ");
-            printRedBlack(node.right);
-        }
-    }
 }
 
 // Aaron End

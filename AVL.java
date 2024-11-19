@@ -6,7 +6,7 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
 
         Node(E element) {
             this.element = element;
-            this.height = 1; // New nodes have height 1 by default
+            this.height = 1; 
         }
     }
 
@@ -32,13 +32,12 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
         } else if (e.compareTo(node.element) > 0) {
             node.right = insert(node.right, e);
         } else {
-            return node; // No duplicates allowed
+            return node; // Avoid duplicates
         }
 
         // Update height of the current node
         node.height = Math.max(height(node.left), height(node.right)) + 1;
 
-        // Balance the node
         return balance(node);
     }
 
@@ -48,13 +47,12 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
         // Left heavy
         if (balanceFactor > 1) {
             if (height(node.left.left) >= height(node.left.right)) {
-                return rotateRight(node); // Left-Left case
+                return rotateRight(node); 
             } else {
-                node.left = rotateLeft(node.left); // Left-Right case
+                node.left = rotateLeft(node.left); 
                 return rotateRight(node);
             }
         }
-
         // Right heavy
         if (balanceFactor < -1) {
             if (height(node.right.right) >= height(node.right.left)) {
@@ -65,22 +63,20 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
             }
         }
 
-        return node; // Node is already balanced
+        return node; // Now balanced
     }
 
     private Node rotateRight(Node y) {
         Node x = y.left;
         Node T2 = x.right;
 
-        // Perform rotation
         x.right = y;
         y.left = T2;
 
-        // Update heights
         y.height = Math.max(height(y.left), height(y.right)) + 1;
         x.height = Math.max(height(x.left), height(x.right)) + 1;
 
-        return x; // Return new root
+        return x; 
     }
 
     private Node rotateLeft(Node x) {
@@ -91,7 +87,6 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
         y.left = x;
         x.right = T2;
 
-        // Update heights
         x.height = Math.max(height(x.left), height(x.right)) + 1;
         y.height = Math.max(height(y.left), height(y.right)) + 1;
 
@@ -132,13 +127,11 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
             if (node.left == null) return node.right;
             if (node.right == null) return node.left;
 
-            // Node with two children: replace with in-order successor
             Node minNode = findMin(node.right);
             node.element = minNode.element;
             node.right = delete(node.right, minNode.element);
         }
 
-        // Update height of the current node
         node.height = Math.max(height(node.left), height(node.right)) + 1;
 
         // Balance the node
@@ -153,7 +146,7 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
     @Override
     public void printInOrder() {
         printInOrder(root);
-        System.out.println(); // New line after printing
+        System.out.println(); 
     }
 
     private void printInOrder(Node node) {
@@ -163,8 +156,6 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
             printInOrder(node.right);
         }
     }
-
-    // Additional AVL-Specific Methods
 
     public void heightAVL() {
         System.out.println("AVL height = " + height(root));
@@ -176,7 +167,7 @@ public class AVL<E extends Comparable<E>> implements TreeInterface<E> {
 
     public void printAVL() {
         printAVL(root);
-        System.out.println(); // New line after printing
+        System.out.println(); 
     }
 
     private void printAVL(Node node) {

@@ -7,45 +7,60 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
             this.element = element;
         }
     }
+
     private Node root;
 
     public Splay() {
         root = null;
     }
+
     @Override
     public void insert(E e) {
         if (e == null) return;
-        root = insert(root, e);
-        root = splay(root, e); 
 
-    private Node insert(Node node, E e) {
-        if (node == null) {
-            return new Node(e);
+        if (root == null) {
+            root = new Node(e);
+            return;
         }
-        if (e.compareTo(node.element) < 0) {
-            node.left = insert(node.left, e);
-        } else if (e.compareTo(node.element) > 0) {
-            node.right = insert(node.right, e);
+
+        root = splay(root, e);
+
+        if (e.compareTo(root.element) < 0) {
+            Node newNode = new Node(e);
+            newNode.left = root.left;
+            newNode.right = root;
+            root.left = null;
+            root = newNode;
+        } else if (e.compareTo(root.element) > 0) {
+            Node newNode = new Node(e);
+            newNode.right = root.right;
+            newNode.left = root;
+            root.right = null;
+            root = newNode;
         }
-        return node;
     }
+
     @Override
     public boolean find(E e) {
         if (e == null) return false;
-        root = splay(root, e); 
+        root = splay(root, e);
         return root != null && root.element.equals(e);
     }
 
     @Override
     public void delete(E e) {
         if (e == null || root == null) return;
-        root = splay(root, e); 
-        if (root != null && root.element.equals(e)) {
+
+        root = splay(root, e);
+
+        if (root.element.equals(e)) {
             if (root.left == null) {
-                root = root.right; 
+                root = root.right;
             } else {
-                Node temp = root;
-                root.right = temp.right; 
+                Node temp = root.right;
+                root = root.left;
+                root = splay(root, e);
+                root.right = temp;
             }
         }
     }
@@ -55,6 +70,7 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
         printInOrder(root);
         System.out.println();
     }
+
     private void printInOrder(Node node) {
         if (node != null) {
             printInOrder(node.left);
@@ -62,6 +78,7 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
             printInOrder(node.right);
         }
     }
+
     public void printRoot() {
         if (root != null) {
             System.out.println("The root contains: " + root.element);
@@ -77,8 +94,57 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
     private void printSplay(Node node) {
         if (node != null) {
             printSplay(node.left);
-            System.out.print("(" + node.element + ",height) "); // Add height info later
+            System.out.print("(" + node.element + ", height) ");
             printSplay(node.right);
         }
+    }
+
+    private Node splay(Node node, E e) {
+        if (node == null || e == null) return node;
+
+        if (e.compareTo(node.element) < 0) {
+            if (node.left == null) return node;
+
+            if (e.compareTo(node.left.element) < 0) {
+                node.left.left = splay(node.left.left, e);
+                node = rotateRight(node);
+            } else if (e.compareTo(node.left.element) > 0) {
+                node.left.right = splay(node.left.right, e);
+                if (node.left.right != null) {
+                    node.left = rotateLeft(node.left);
+                }
+            }
+            return node.left == null ? node : rotateRight(node);
+
+        } else if (e.compareTo(node.element) > 0) {
+            if (node.right == null) return node;
+
+            if (e.compareTo(node.right.element) > 0) {
+                node.right.right = splay(node.right.right, e);
+                node = rotateLeft(node);
+            } else if (e.compareTo(node.right.element) < 0) {
+                node.right.left = splay(node.right.left, e);
+                if (node.right.left != null) {
+                    node.right = rotateRight(node.right);
+                }
+            }
+            return node.right == null ? node : rotateLeft(node);
+        } else {
+            return node;
+        }
+    }
+
+    private Node rotateLeft(Node node) {
+        Node newRoot = node.right;
+        node.right = newRoot.left;
+        newRoot.left = node;
+        return newRoot;
+    }
+
+    private Node rotateRight(Node node) {
+        Node newRoot = node.left;
+        node.left = newRoot.right;
+        newRoot.right = node;
+        return newRoot;
     }
 }
