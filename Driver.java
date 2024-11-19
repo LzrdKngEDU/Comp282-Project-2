@@ -1,7 +1,7 @@
 public class Driver {
     public static void main(String[] args) {
         System.out.println("Testing AVL Tree:");
-        BalanceTree<Integer> avlTree = new AVL<>();
+        TreeInterface<Integer> avlTree = new AVL<>();
         avlTree.insert(10);
         avlTree.insert(20);
         avlTree.insert(5);
@@ -11,7 +11,7 @@ public class Driver {
         avlTree.printInOrder(); // Should print the AVL tree after deletion
 
         System.out.println("\nTesting Splay Tree:");
-        BalanceTree<Integer> splayTree = new Splay<>();
+        TreeInterface<Integer> splayTree = new Splay<>();
         splayTree.insert(15);
         splayTree.insert(25);
         splayTree.insert(10);
@@ -21,7 +21,7 @@ public class Driver {
         splayTree.printInOrder(); // Should print the Splay tree after deletion
 
         System.out.println("\nTesting Red-Black Tree:");
-        BalanceTree<Integer> rbTree = new RedBlack<>();
+        TreeInterface<Integer> rbTree = new RedBlack<>();
         rbTree.insert(30);
         rbTree.insert(40);
         rbTree.insert(20);
