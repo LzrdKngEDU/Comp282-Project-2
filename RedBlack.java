@@ -47,18 +47,33 @@ public class RedBlack<E extends Comparable<E>> implements TreeInterface<E> {
 // Aaron
     @Override
     public void delete(E e) {
-        root = delete(root, e); // Perform delete operation and balance
+        root = delete(root, e); 
     }
-
     private Node delete(Node node, E e) {
         if (node == null) return null;
-        // Delete operation for red-black tree
-        return node; // Placeholder
-    }
+        if (e.compareTo(node.element) < 0) {
+            node.left = delete(node.left, e); // Left Tree
+        } else if (e.compareTo(node.element) > 0) {
+            node.right = delete(node.right, e); // Right Tree
+        } else {
+            if (node.left == null || node.right == null) {
+                Node replace = (node.left != null) ? node.left : node.right;
+
+                if (replace != null) {
+                    replace.parent = node.parent; 
+                }
+                return replace; 
+            } else {//case 3
+                Node successor = findMin(node.right); // Small val
+                node.element = successor.element; //new element
+                node.right = delete(node.right, successor.element); //deletion
+            }
+        }
 // Aaron Start
     @Override
     public void printInOrder() {
-        printInOrder(root); // In-order traversal
+        printInOrder(root);
+        System.out.println(); // In-order traversal
     }
 
     private void printInOrder(Node node) {
