@@ -7,55 +7,54 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
             this.element = element;
         }
     }
-
     private Node root;
 
     public Splay() {
         root = null;
     }
-
     @Override
     public void insert(E e) {
-        root = insert(root, e); // Insert into the splay tree
-        // Splay the tree after insertion
-    }
+        if (e == null) return;
+        root = insert(root, e);
+        root = splay(root, e); 
 
     private Node insert(Node node, E e) {
         if (node == null) {
             return new Node(e);
         }
-        // Perform standard insert operation for splay tree
-        return node; // Placeholder
+        if (e.compareTo(node.element) < 0) {
+            node.left = insert(node.left, e);
+        } else if (e.compareTo(node.element) > 0) {
+            node.right = insert(node.right, e);
+        }
+        return node;
     }
-
     @Override
     public boolean find(E e) {
-        return find(root, e);
-    }
-
-    private boolean find(Node node, E e) {
-        if (node == null) return false;
-        if (e.compareTo(node.element) == 0) return true;
-        // Perform splay operation
-        return false; // Placeholder
+        if (e == null) return false;
+        root = splay(root, e); 
+        return root != null && root.element.equals(e);
     }
 
     @Override
     public void delete(E e) {
-        root = delete(root, e); // Perform delete operation for splay tree
-    }
-
-    private Node delete(Node node, E e) {
-        if (node == null) return null;
-        // Perform delete operation and splay the tree
-        return node; // Placeholder
+        if (e == null || root == null) return;
+        root = splay(root, e); 
+        if (root != null && root.element.equals(e)) {
+            if (root.left == null) {
+                root = root.right; 
+            } else {
+                Node temp = root;
+                root.right = temp.right; 
+            }
+        }
     }
 
     @Override
     public void printInOrder() {
-        printInOrder(root); // In-order traversal
+        printInOrder(root);
+        System.out.println();
     }
-
     private void printInOrder(Node node) {
         if (node != null) {
             printInOrder(node.left);
@@ -63,12 +62,11 @@ public class Splay<E extends Comparable<E>> implements TreeInterface<E> {
             printInOrder(node.right);
         }
     }
-
-    // Additional methods
-
     public void printRoot() {
         if (root != null) {
             System.out.println("The root contains: " + root.element);
+        } else {
+            System.out.println("The tree is empty.");
         }
     }
 
