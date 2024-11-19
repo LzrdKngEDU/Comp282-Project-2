@@ -138,12 +138,8 @@ private void flipColors(Node node) {
 // Aaron Start
     @Override
     public void printInOrder() {
-<<<<<<< HEAD
         printInOrder(root);
         System.out.println(); // In-order traversal
-=======
-        printInOrder(root); 
->>>>>>> b4d8faeb1cb2e8d0b04b9cf4f334df9e851fe80f
     }
 
     private void printInOrder(Node node) {
